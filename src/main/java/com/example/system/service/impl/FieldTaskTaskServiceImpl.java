@@ -11,7 +11,12 @@ import com.example.system.util.UUIDUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +80,15 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
         }
 
         this.removeById(id);
+        // 删除文件
+        String fileAddress = taskEntity.getFileAddress();
+        if (fileAddress != null) {
+            String fileDir = "E:/File Upload Directory/";
+            File file = new File(fileDir + fileAddress);
+            if (file.exists()) {
+                file.delete();
+            }
+        }
     }
 
     @Override
@@ -108,7 +122,6 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
         }
         BeanUtils.copyProperties(fieldTask, taskEntity);
 //        taskEntity.setTaskSpot(fieldTask.getTaskSpot().toString());
-
         updateById(taskEntity);
 
     }
@@ -145,6 +158,67 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
         } else {
             fieldTaskDTO.setTaskSpot(new Coordinate(taskSpot));
         }
+        String fileAddress = taskEntity.getFileAddress();
+        if (fileAddress != null) {
+            fieldTaskDTO.setFileName(getFileName(fileAddress));
+        } else {{
+            fieldTaskDTO.setFileName(null);
+        }}
         return fieldTaskDTO;
+    }
+
+    @Override
+    public void uploadFile(Long id, MultipartFile file) {
+        // 将文件上传到 E:/upload/ 目录下，文件名为 id_文件名
+        String uploadDir = "E:/File Upload Directory/123456_测试文件.txt";
+
+        // 确保目录存在
+        File dir = new File(uploadDir);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        // 构建目标文件路径
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null) {
+            throw new IllegalArgumentException("File name must not be null");
+        }
+        String targetFilename = id + "_" + originalFilename;
+        File targetFile = new File(uploadDir + targetFilename);
+
+        try {
+            // 将文件传输到目标位置
+            file.transferTo(targetFile);
+            // 更新数据库记录
+            FieldTaskEntity taskEntity = getById(id);
+            taskEntity.setFileAddress(uploadDir + targetFilename);
+            updateById(taskEntity);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("File upload failed", e);
+        }
+    }
+
+    @Override
+    public byte[] downloadFile(Long id) {
+        FieldTaskEntity taskEntity = getById(id);
+        String fileAddress = taskEntity.getFileAddress();
+        if (fileAddress == null) {
+            throw new IllegalArgumentException("当前没有文件");
+        }
+        String fileDir = "E:/File Upload Directory/";
+        // 读取文件内容并返回
+        File file = new File(fileDir + fileAddress);
+        try {
+            return Files.readAllBytes(file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("文件下载失败");
+        }
+    }
+
+    private String getFileName(String fileAddress) {
+        String[] split = fileAddress.split("_");
+        return split[1];
     }
 }

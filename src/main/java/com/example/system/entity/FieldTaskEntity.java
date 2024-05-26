@@ -37,4 +37,7 @@ public class FieldTaskEntity implements Serializable {
 
     @TableField("status")
     private int status;
+
+    @TableField("file_address")
+    private String fileAddress;
 }

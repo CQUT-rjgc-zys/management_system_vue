@@ -33,4 +33,6 @@ public class FieldTaskDTO implements Serializable {
     private Coordinate taskSpot;
 
     private int status;
+
+    private String fileName;
 }

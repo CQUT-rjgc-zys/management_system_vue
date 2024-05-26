@@ -27,6 +27,4 @@ public class UserDTO implements Serializable {
     private Long department;
 
     private Integer taskAmount;
-
-    private Integer status;
 }

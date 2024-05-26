@@ -6,6 +6,7 @@ import com.example.system.service.FieldTaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -53,9 +54,30 @@ public class FieldTaskController {
         return CommonResult.success(results);
     }
 
+    /**
+     * 根据id获取任务
+     */
     @GetMapping("/getFieldTaskById/{id}")
     public CommonResult<FieldTaskDTO> getFieldTaskById(@PathVariable("id") Long id) {
         FieldTaskDTO result = fieldTaskService.getFieldTaskById(id);
         return CommonResult.success(result);
+    }
+
+    /**
+     * 上传相关文件
+     */
+    @PostMapping("/uploadFile/{id}")
+    public CommonResult<Void> uploadFile(@PathVariable("id") Long id, @RequestParam("file") MultipartFile file) {
+        fieldTaskService.uploadFile(id, file);
+        return CommonResult.success();
+    }
+
+    /**
+     * 下载相关文件
+     */
+    @GetMapping("/downloadFile/{id}")
+    public CommonResult<byte[]> downloadFile(@PathVariable("id") Long id) {
+        byte[] data =fieldTaskService.downloadFile(id);
+        return CommonResult.success(data);
     }
 }
