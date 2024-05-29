@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.system.dto.Coordinate;
 import com.example.system.dto.FieldTaskDTO;
 import com.example.system.entity.FieldTaskEntity;
+import com.example.system.entity.TaskAllocationEntity;
 import com.example.system.mapper.FieldTaskMapper;
+import com.example.system.mapper.TaskAllocationMapper;
 import com.example.system.service.FieldTaskService;
 import com.example.system.util.UUIDUtil;
 import org.springframework.beans.BeanUtils;
@@ -28,6 +30,9 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
 
     @Autowired
     private FieldTaskMapper fieldTaskMapper;
+
+    @Autowired
+    private TaskAllocationMapper taskAllocationMapper;
 
     @Override
     public void addFieldTask(FieldTaskDTO fieldTask) {
@@ -170,7 +175,7 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
     @Override
     public void uploadFile(Long id, MultipartFile file) {
         // 将文件上传到 E:/upload/ 目录下，文件名为 id_文件名
-        String uploadDir = "E:/File Upload Directory/123456_测试文件.txt";
+        String uploadDir = "E:/File Upload Directory/";
 
         // 确保目录存在
         File dir = new File(uploadDir);
@@ -215,6 +220,32 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
             e.printStackTrace();
             throw new RuntimeException("文件下载失败");
         }
+    }
+
+    @Override
+    public List<FieldTaskDTO> getAcceptedFieldTasksByUserId(Long userId) {
+        QueryWrapper<TaskAllocationEntity> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq("status", 1);
+        List<TaskAllocationEntity> taskAllocationEntities = taskAllocationMapper.selectList(queryWrapper);
+        List<Long> taskIds = taskAllocationEntities.stream().map(TaskAllocationEntity::getTaskId).collect(Collectors.toList());
+        if (taskIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<FieldTaskEntity> fieldTaskEntities = listByIds(taskIds);
+        List<FieldTaskDTO> results = new ArrayList<>();
+        fieldTaskEntities.forEach(task -> {
+            FieldTaskDTO fieldTaskDTO = new FieldTaskDTO();
+            BeanUtils.copyProperties(task, fieldTaskDTO);
+            String taskSpot = task.getTaskSpot();
+            if (taskSpot == null) {
+                fieldTaskDTO.setTaskSpot(null);
+            } else {
+                fieldTaskDTO.setTaskSpot(new Coordinate(taskSpot));
+            }
+            results.add(fieldTaskDTO);
+        });
+        return results;
     }
 
     private String getFileName(String fileAddress) {

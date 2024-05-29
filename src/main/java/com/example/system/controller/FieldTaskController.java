@@ -55,6 +55,15 @@ public class FieldTaskController {
     }
 
     /**
+     * 根据用户id获取已接受的任务列表
+     */
+    @GetMapping("/getAcceptedFieldTasksByUserId/{userId}")
+    public CommonResult<List<FieldTaskDTO>> getAcceptedFieldTasksByUserId(@PathVariable("userId") Long userId) {
+        List<FieldTaskDTO> results = fieldTaskService.getAcceptedFieldTasksByUserId(userId);
+        return CommonResult.success(results);
+    }
+
+    /**
      * 根据id获取任务
      */
     @GetMapping("/getFieldTaskById/{id}")

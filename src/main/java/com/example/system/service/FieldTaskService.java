@@ -22,4 +22,6 @@ public interface FieldTaskService extends IService<FieldTaskEntity> {
     void uploadFile(Long id, MultipartFile file);
 
     byte[] downloadFile(Long id);
+
+    List<FieldTaskDTO> getAcceptedFieldTasksByUserId(Long userId);
 }
