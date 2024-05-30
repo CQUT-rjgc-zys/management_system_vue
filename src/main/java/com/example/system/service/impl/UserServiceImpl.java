@@ -16,6 +16,7 @@ import com.example.system.util.JwtTokenUtil;
 import com.example.system.util.MD5;
 import com.example.system.util.RedisUtil;
 import com.example.system.util.UUIDUtil;
+import org.apache.catalina.User;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -88,7 +89,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
         QueryWrapper<UserEntity> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("name", username);
         UserEntity userEntity = this.getOne(queryWrapper);
-
         if (userEntity == null) {
             throw new IllegalArgumentException("不存在用户名为：" + username + "的管理员");
         }
@@ -100,7 +100,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        if (!MD5.encrypt(password).equals(userEntity.getPassword())) {
 //            throw new IllegalArgumentException("密码错误");
 //        }
-
         String token = jwtTokenUtil.generateToken(userEntity.getJobNumber());
         String key = "token:" + userEntity.getJobNumber();
         redisUtil.setWithExpire(key, token, 7, TimeUnit.DAYS);
@@ -108,7 +107,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
     }
 
     @Override
-    public String employeeLogin(String jobNumber, String password) {
+    public Map<String, Object> employeeLogin(String jobNumber, String password) {
         if (jobNumber == null || jobNumber.isEmpty()){
             throw new IllegalArgumentException("工号不能为空");
         }
@@ -130,11 +129,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserEntity> impleme
 //        if (!MD5.encrypt(password).equals(userEntity.getPassword())) {
 //            throw new IllegalArgumentException("密码错误");
 //        }
-
+        Map<String, Object> map = new HashMap<>();
+        UserDTO userDTO = new UserDTO();
+        BeanUtils.copyProperties(userEntity, userDTO);
+        Byte gender = userEntity.getGender();
+        if (gender == 0) {
+            userDTO.setGender("0");
+        } else {
+            userDTO.setGender("1");
+        }
+        map.put("user", userDTO);
         String token = jwtTokenUtil.generateToken(jobNumber);
         String key = "token:" + jobNumber;
         redisUtil.setWithExpire(key, token, 7, TimeUnit.DAYS);
-        return token;
+        map.put("token", token);
+        return map;
     }
 
     @Override

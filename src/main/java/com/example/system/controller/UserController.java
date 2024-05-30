@@ -43,9 +43,9 @@ public class UserController {
      * 员工登录
      */
     @PutMapping("/employeeLogin")
-    public CommonResult<String> employeeLogin(@RequestParam("jobNumber") String jobNumber, @RequestParam("password") String password) {
-        String token = userService.employeeLogin(jobNumber, password);
-        return CommonResult.success(token);
+    public CommonResult<Map<String, Object>> employeeLogin(@RequestParam("jobNumber") String jobNumber, @RequestParam("password") String password) {
+        Map<String, Object> map = userService.employeeLogin(jobNumber, password);
+        return CommonResult.success(map);
     }
 
     @DeleteMapping("/deleteOneById/{id}")
@@ -87,6 +87,12 @@ public class UserController {
     @PutMapping("/updateEmployee")
     public CommonResult<Void> updateEmployee(@RequestBody UserDTO userDTO) {
         userService.updateEmployee(userDTO.getId(), userDTO.getGender(), userDTO.getDepartment());
+        return CommonResult.success();
+    }
+
+    @PutMapping("/updatePassword")
+    public CommonResult<Void> updatePassword(@RequestParam("id") Long id, @RequestParam("password") String password) {
+        System.out.println();
         return CommonResult.success();
     }
 

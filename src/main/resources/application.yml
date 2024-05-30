@@ -6,12 +6,16 @@ server:
 spring:
   datasource:
 #    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://47.115.226.7:3306/enterprise_filed_management_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
+    url: jdbc:mysql://47.109.33.177:3306/enterprise_filed_management_system?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false
     username: root
     password: 123456
   redis:
-    host: 47.115.226.7
+    host: 47.109.33.177
     port: 6379
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
 
 # mybatis-plus配置
 mybatis-plus:

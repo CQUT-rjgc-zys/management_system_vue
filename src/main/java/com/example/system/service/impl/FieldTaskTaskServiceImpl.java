@@ -213,7 +213,7 @@ public class FieldTaskTaskServiceImpl extends ServiceImpl<FieldTaskMapper, Field
         }
         String fileDir = "E:/File Upload Directory/";
         // 读取文件内容并返回
-        File file = new File(fileDir + fileAddress);
+        File file = new File(fileAddress);
         try {
             return Files.readAllBytes(file.toPath());
         } catch (IOException e) {

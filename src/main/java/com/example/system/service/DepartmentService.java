@@ -13,4 +13,6 @@ public interface DepartmentService extends IService<DepartmentEntity> {
     void deleteDepartment(Long id);
 
     List<DepartmentDTO> getDepartments();
+
+    DepartmentDTO getDepartment(Long id);
 }

@@ -41,4 +41,10 @@ public class DepartmentController {
         List<DepartmentDTO> departments = departmentService.getDepartments();
         return CommonResult.success(departments);
     }
+
+    @GetMapping("/getDepartment/{id}")
+    public CommonResult<DepartmentDTO> getDepartment(@PathVariable("id") Long id) {
+        DepartmentDTO department = departmentService.getDepartment(id);
+        return CommonResult.success(department);
+    }
 }

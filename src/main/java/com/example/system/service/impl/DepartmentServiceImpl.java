@@ -60,4 +60,12 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
                 })
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public DepartmentDTO getDepartment(Long id) {
+        DepartmentEntity departmentEntity = getById(id);
+        DepartmentDTO departmentDTO = new DepartmentDTO();
+        BeanUtils.copyProperties(departmentEntity, departmentDTO);
+        return departmentDTO;
+    }
 }

@@ -12,7 +12,7 @@ public interface UserService {
 
     String adminLogin(String username, String password);
 
-    String employeeLogin(String jobNumber, String password);
+    Map<String, Object> employeeLogin(String jobNumber, String password);
 
     UserDTO getUserById(Long id);
 
