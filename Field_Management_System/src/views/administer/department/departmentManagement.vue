@@ -142,7 +142,8 @@ function deleteDepartment() {
     deleteFormVisible.value = false
   }, err => {
     console.log(err)
-    
+    ElMessage.error(err.response.data.message)
+    deleteFormVisible.value = false
   })
 }
 
